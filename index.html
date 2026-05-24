@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <title>WK1</title>
+    
+
+  </head>
+    
+  <body>
+  <!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>獨立研究_WK1</title>
+    <style>
+        /* ==========================================
+           1. 全局初始化與基本樣式
+           ========================================== */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+            color: #000000;
+            line-height: 1.8;
+            background-color: #f4f6f8;
+            padding: 0 20px 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* 互動工具列樣式 */
+        .toolbar {
+            position: sticky;
+            top: 0;
+            width: 100%;
+            max-width: 1150px;
+            background-color: #ffffff;
+            padding: 15px 25px;
+            margin: 20px 0;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            z-index: 1000;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+            border: 1px solid #e2e8f0;
+        }
+
+        .toolbar-title {
+            font-weight: bold;
+            color: #1e293b;
+            margin-right: 8px;
+            font-size: 1rem;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 6px;
+            border: 1px solid #cbd5e1;
+            background-color: #ffffff;
+            color: #334155;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn:hover {
+            background-color: #f8fafc;
+            border-color: #94a3b8;
+        }
+
+        .btn.active {
+            background-color: #1e293b;
+            color: #ffffff;
+            border-color: #1e293b;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 各別工具按鈕特色外觀 */
+        .btn-blue-tool.active { background-color: #2563eb !important; color: white; }
+        .btn-yellow-tool.active { background-color: #eab308 !important; color: black; }
+        .btn-bold-tool.active { background-color: #475569 !important; color: white; }
+        .btn-erase-tool.active { background-color: #dc2626 !important; color: white; }
+        
+        .btn-undo { background-color: #f1f5f9; border-color: #cbd5e1; }
+        .btn-undo:active { background-color: #e2e8f0; }
+
+        .btn-export {
+            background-color: #10b981;
+            color: #ffffff;
+            border: none;
+            margin-left: auto;
+            font-weight: bold;
+        }
+        .btn-export:hover {
+            background-color: #059669;
+        }
+
+        .worksheet-container {
+            width: 100%;
+            max-width: 1150px;
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+        }
+
+        h2.section-title {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin: 40px 0 20px 0;
+            letter-spacing: 2px;
+            border-bottom: 2px solid #000000;
+            padding-bottom: 8px;
+        }
+
+        /* ==========================================
+           教學目標與卡片樣式
+           ========================================== */
+        .target-box {
+            padding: 28px 32px;
+            margin-bottom: 40px;
+            position: relative;
+            text-align: center;
+            background-color: #ffffff;
+            background-image: url('https://i.postimg.cc/6pd1yvDj/kuang-xian.png');
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: 100% auto;
+            padding-bottom: 120px;
+            background-attachment: scroll;
+            min-height: 600px;
+        }
+
+        .target-box h1 {
+            font-size: 2rem;
+            font-weight: bold;
+            letter-spacing: 3px;
+            margin: 0px 0px 18px 0px;
+            display: inline-block;
+            position: relative;
+            top: 50px;
+        }
+
+        .target-box h1::before, .target-box h1::after {
+            content: "◇";
+            display: inline-block;
+            margin: 0 12px;
+            font-size: 0.8rem;
+        }
+
+        .target-list {
+            list-style: disc;
+            font-size: 1.2rem;
+            color: #000000;
+            position: relative;
+            line-height: 2;
+            text-align: left;
+            top: 70px;
+            padding-left: 30px;
+            padding-right: 10px;
+        }
+
+        .target-list li { margin-bottom: 15px; }
+
+        .intro-cards { display: flex; gap: 20px; margin-bottom: 40px; }
+        .card { flex: 1; padding: 0; text-align: center; background-color: #ffffff; }
+        .card img { width: 100%; height: 160px; object-fit: contain; margin-bottom: 12px; }
+        .card h3 { font-size: 1.3rem; margin-bottom: 8px; font-weight: bold; letter-spacing: 1px; }
+        .card p { font-size: 0.95rem; text-align: center; color: #555555; line-height: 1.5; }
+
+        .card-input-group {
+            margin-top: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: stretch;
+        }
+
+        .card-input-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            justify-content: flex-start;
+            padding: 0 12px;
+        }
+
+        .card-input-item span {
+            font-weight: bold;
+            color: #1e293b;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        .card-input-item input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            font-family: inherit;
+            background-color: #ffffff;
+            color: #000000;
+            transition: border-color 0.2s, background-color 0.2s;
+        }
+
+        .card-input-item input:focus {
+            border-color: #1e293b;
+            outline: none;
+            background-color: #f8fafc;
+        }
+
+        .card-input-item input::placeholder {
+            color: #94a3b8;
+        }
+
+        /* ==========================================
+           課文互動分析複合排版
+           ========================================== */
+        .paragraph-row {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: stretch;
+        }
+
+        .article-box {
+            background-color: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 7px;
+            line-height: 1.75;
+            font-size: 0.9rem;
+            text-align: justify;
+            user-select: none;
+        }
+
+        .summary-box {
+            width: 100%;
+            min-height: 140px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 15px;
+            font-size: 1rem;
+            line-height: 1.6;
+            background-color: #fffdf9;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        .summary-box:focus {
+            border-color: #1e293b;
+            outline: none;
+            background-color: #ffffff;
+        }
+
+        /* 互動詞彙方塊與字元 */
+        .word-block {
+            display: inline-block;
+            padding: 2px 8px;
+            margin: 4px 6px;
+            border-radius: 3px;
+            background-color: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            cursor: pointer;
+            transition: background-color 0.15s, border-color 0.15s;
+            vertical-align: middle;
+        }
+
+        .char {
+            position: relative;
+            display: inline-block;
+            padding: 0 1px;
+        }
+
+        /* 標點符號樣式 */
+        .punct {
+            display: inline-block;
+            margin: 0 2px;
+            color: #334155;
+            font-weight: bold;
+            font-size: 0.8rem;
+            vertical-align: middle;
+        }
+
+        /* 小刀滑過時的切分提示線 */
+        .knife-mode .char:hover {
+            background-color: rgba(239, 68, 68, 0.3);
+            border-right: 2px solid #ef4444;
+            margin-right: -2px;
+            z-index: 10;
+        }
+
+        /* 混色渲染機制：藍色、黃色、以及雙色重疊之綠色 */
+        .word-block.has-blue { background-color: #bfdbfe !important; border-color: #60a5fa; }
+        .word-block.has-yellow { background-color: #fef08a !important; border-color: #facc15; }
+        .word-block.has-blue.has-yellow { background-color: #bbf7d0 !important; border-color: #4ade80; } /* 藍+黃=綠 */
+        
+        /* 粗體連接詞樣式 */
+        .word-block.is-bold { font-weight: bold; border-width: 2px; border-color: #334155; box-shadow: 0 1px 3px rgba(0,0,0,0.15); }
+
+        /* ==========================================
+           詞彙句型與克漏字
+           ========================================== */
+        .cihui-group { margin-bottom: 25px; }
+        .cihui-title { font-size: 1.1rem; font-weight: bold; margin-bottom: 8px; display: flex; align-items: center; }
+        .cihui-title::before { content: "•"; margin-right: 8px; }
+        .lijv { width: 100%; height: auto; background-color: #f4efe6; border-radius: 6px; padding: 15px; margin-bottom: 10px; }
+        .quiz-container { border: 2px solid #000000; margin-top: 20px; }
+        .quiz-header { display: flex; border-bottom: 2px solid #000000; background-color: #ffffff; text-align: center; font-weight: bold; font-size: 0.95rem; }
+        .quiz-header div { flex: 1; padding: 8px 0; border-right: 1px solid #000000; }
+        .quiz-header div:last-child { border-right: none; }
+        .quiz-body { display: flex; }
+        .quiz-sidebar { width: 40px; border-right: 2px solid #000000; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.1rem; writing-mode: vertical-rl; letter-spacing: 4px; background-color: #ffffff; }
+        .quiz-text { flex: 1; padding: 20px; font-size: 1.05rem; text-align: justify; line-height: 2; }
+        .blank-space { display: inline-block; width: 50px; border-bottom: 1px solid #000000; text-align: center; margin: 0 4px; font-weight: bold; background-color: #fff9e6; }
+        .answer-table { width: 100%; border-collapse: collapse; margin-top: -2px; }
+        .answer-table td { border: 2px solid #000000; text-align: center; padding: 10px; font-size: 1rem; }
+        .answer-table tr:first-child td { font-weight: bold; background-color: #ffffff; width: 20%; }
+        .answer-table tr:last-child td { height: 45px; }
+
+        /* ==========================================
+           PDF 匯出專用自動補充詞彙表
+           ========================================== */
+        #supplementary-section { margin-top: 50px; display: none; }
+        .vocab-table { width: 100%; border-collapse: collapse; margin-top: 15px; margin-bottom: 35px; font-size: 1rem; background-color: #ffffff; }
+        .vocab-table th, .vocab-table td { border: 1px solid #cbd5e1; padding: 12px 14px; text-align: left; line-height: 1.6; }
+        .vocab-table th { background-color: #f1f5f9; color: #1e293b; font-weight: bold; }
+        .vocab-title-blue { color: #1d4ed8; border-left: 5px solid #2563eb; padding-left: 10px; margin-bottom: 10px; font-size: 1.4rem; font-weight: bold; }
+        .vocab-title-yellow { color: #a16207; border-left: 5px solid #eab308; padding-left: 10px; margin-bottom: 10px; font-size: 1.4rem; font-weight: bold; }
+
+        /* ==========================================
+           列印與 PDF 匯出最佳化基礎樣式
+           ========================================== */
+        @media print {
+            body {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            
+            .toolbar {
+                display: none !important; /* 隱藏上方的工具列 */
+            }
+            
+            .worksheet-container {
+                box-shadow: none !important;
+            }
+            
+            /* 允許老師在產出的 PDF 中選取文字 */
+            .article-box {
+                user-select: text !important;
+                -webkit-user-select: text !important;
+            }
+            
+            /* 確保橫向排版時，課文與大意依然保持左右並排 */
+            .paragraph-row {
+                display: grid !important;
+                grid-template-columns: 1fr 300px !important;
+                gap: 25px !important;
+            }
+            
+            /* 輸入框列印樣式基礎設定 */
+            .summary-box {
+                background-color: #fffdf9 !important;
+                border: 1px solid #cbd5e1 !important;
+                resize: none !important;
+                overflow: hidden !important; /* 隱藏捲軸 */
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="toolbar">
+        <span class="toolbar-title">課文分析工具：</span>
+        <button class="btn active" id="tool-knife" onclick="setMode('knife', this)">🔪斷詞</button>
+        <button class="btn btn-undo" onclick="undo()">↩️返回</button>
+        <span style="border-left: 1px solid #cbd5e1; height: 24px; margin: 0 4px;"></span>
+        <button class="btn btn-blue-tool" onclick="setMode('paint-blue', this)">🔷不懂的詞</button>
+        <button class="btn btn-yellow-tool" onclick="setMode('paint-yellow', this)">🔶關鍵詞</button>
+        <button class="btn btn-bold-tool" onclick="setMode('bold', this)"><b>B</b> 連接詞</button>
+        <button class="btn btn-erase-tool" onclick="setMode('erase', this)">🧼橡皮擦</button>
+        <button class="btn btn-export" onclick="exportPDF()">📄匯出 PDF </button>
+    </div>
+
+    <div class="worksheet-container" id="print-area">
+        
+        <div class="target-box">
+            <h1>學習目標</h1>
+            <ul class="target-list">
+                <li>我能用三段話討論人工智慧會為人類帶來什麼影響，包括人工智慧的背景、正負面影響以及個人的立場。</li>
+                <li>我能用三段話討論「是否應該限制人工智慧的發展？」，先介紹正方或是反方的觀點、分析哪些觀點合理與哪些觀點不合理，最後說明自己的立場。</li>
+                <li>我能用三段話討論人工智慧未來可能的發展，首先討論好的情況，接著分析不好的情況，最後提出自己的建議。</li>
+            </ul>
+        </div>
+
+        <div class="intro-cards">
+            <div class="card">
+                <img src="https://i.postimg.cc/mgcXbRh9/li-bi.png" alt="利弊示意圖">
+                <h3>利弊</h3>
+                <p>使用人工智慧有什麼優點和缺點？</p>
+                <div class="card-input-group">
+                    <div class="card-input-item">
+                        <span>#</span>
+                        <input type="text" placeholder="a topic or an idea">
+                    </div>
+                    <div class="card-input-item">
+                        <span>#</span>
+                        <input type="text" placeholder="a topic or an idea">
+                    </div>
+                    <div class="card-input-item">
+                        <span>#</span>
+                        <input type="text" placeholder="a topic or an idea">
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <img src="https://i.postimg.cc/HxmB4yz4/bian-lun.png" alt="辯論示意圖">
+                <h3>辯論</h3>
+                <p>是否應該限制人工智慧？</p>
+                <div class="card-input-group">
+                    <div class="card-input-item">
+                        <span>#</span>
+                        <input type="text" placeholder="a topic or an idea">
+                    </div>
+                    <div class="card-input-item">
+                        <span>#</span>
+                        <input type="text" placeholder="a topic or an idea">
+                    </div>
+                    <div class="card-input-item">
+                        <span>#</span>
+                        <input type="text" placeholder="a topic or an idea">
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <img src="https://i.postimg.cc/SRTdhthN/jia-she.png" alt="假設示意圖">
+                <h3>假設</h3>
+                <p>假設人工智慧繼續發展，未來會如何？</p>
+                <div class="card-input-group">
+                    <div class="card-input-item">
+                        <span>#</span>
+                        <input type="text" placeholder="a topic or an idea">
+                    </div>
+                    <div class="card-input-item">
+                        <span>#</span>
+                        <input type="text" placeholder="a topic or an idea">
+                    </div>
+                    <div class="card-input-item">
+                        <span>#</span>
+                        <input type="text" placeholder="a topic or an idea">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <h2 class="section-title">課文</h2>
+        
+        <div class="article-content">自 ChatGPT 問世以來，各式各樣的 AI 工具在市面上如雨後春筍般層出不窮。許多人早已將這些工具應用於生活的方方面面，當然「學習一門外語」這件事情也不例外。雖然人們已經從中獲得了不少好處，並對於人工智慧的發展感到震驚，但有些人對於AI工具的了解仍停留在表面的階段，或甚至是對於所謂的AI工具避之唯恐不及，因此這篇文章我希望能從比較平易近人的角度帶大家認識如何使用 AI 來自學一門語言，並分享一些常見的踩坑經驗，幫助大家少走冤枉路。</div>
+
+        <div class="article-content">「人工智慧 AI」這個詞所涉及的範圍很廣，而且每個人的定義都有所不同，但這篇文章會聚焦於「生成式人工智慧」的相關工具上，而所謂的生成式人工智慧，簡單來說，就是能夠「自己產出內容」的 AI，例如寫文章、畫圖、作曲，甚至是生成影片。ChatGPT 對話機器人就是這類技術的一個代表，像 ChatGPT 這樣的工具，其背後的核心技術就是大語言模型（Large Language Model，簡稱 LLM）。你可以把它想像成一個用大量的文本資料來訓練的寫作機器人，它能夠透過訓練資料中的統計特徵，來預測在某個上下文中最有可能出現的下一個詞，換言之，它最擅長的其實就是「造句接龍」或是「克漏字填空」。</div>
+
+        <div class="article-content">因此若是學習外語的初學者太過相信 AI 所生成的內容，就很有可能會踩坑。許多語言學習者在使用 ChatGPT 等工具時，習慣直接詢問語法規則，例如：「為什麼這句話要用某某語法？」或者是「A 詞彙和 B 詞彙之間有什麼不同？」AI 確實會給出一套看似合理的解釋，但其實這些回答有時並不正確，甚至會出現語法錯誤或觀念混淆的情況。這種情形在 AI 領域中被稱為「幻覺 hallucination」，也就是 AI生成了看起來正確、實際上錯誤的內容。因此我建議學習者在詢問語法時，不要把 AI 的說法當成唯一標準，尤其是在沒有語言背景知識的情況下。比較保險的做法是：請 AI 提供多個例句，再從中觀察語法使用的方式，若有需要再搭配語法書或請教老師，這樣才不會學到錯誤的知識。</div>
+
+        <div class="article-content">另一個常見的坑則是：遇到讀不懂的文章時，直接用 AI 做摘要，然後只讀摘要。這種做法雖然快速省力，但長期下來無法培養自己的閱讀能力。做摘要畢竟是閱讀理解的重要能力之一，學生若只依賴AI來做摘要，就無法訓練自己辨識文章結構、抓重點、處理長句或生字的能力。比較建議的方式是，善用 AI 來處理那些重複性高、瑣碎且耗時的任務，例如查字典、整理例句或製作閃卡等。這樣不但可以保留自己主動閱讀、推理與理解的過程，同時也能提高閱讀效率，不容易產生挫折感。</div>
+
+        <div class="article-content">總的來說，AI 工具確實為語言自學者提供了前所未建立的便利與彈性，它可以是你隨時隨地的語言練習夥伴，幫你修改作文、練習對話，或是提供模擬的情境進行角色扮演，而且在這個過程中也不必擔心真人所帶來的壓力或語言障礙所帶來的不安。然而，我們在享受這些便利的同時，也需要培養辨別與反思的能力，避免誤信錯誤資訊，或是因為偷懶而忽略了學習過程中需要培養的思考能力。善用 AI，讓它替我們節省時間，但不要讓它代替我們思考。唯有這樣，我們才能真正地把 AI 化為學習的助力，而不是阻力。</div>
+
+        <h2 class="section-title">詞彙句型</h2>
+        <div class="cihui-group">
+            <div class="cihui-title">生成 + 文字 / 影像 / 聲音</div>
+            <div class="lijv">學習者可以利用人工智慧的工具來生成練習對話的文字內容，模擬各種溝通情境。</div>
+            <div class="lijv">除了文字之外，人工智慧也能生成各種影像與聲音，提供多元的學習刺激。</div>
+        </div>
+
+        <div class="cihui-group">
+            <div class="cihui-title">簡單來說、用白話的方式來說</div>
+            <div class="lijv">什麼是「大語言模型」呢？簡單來說，就是透過大數據訓練而成的、能夠理解人類語言的人工智慧模型。</div>
+            <div class="lijv">所謂的「生成式人工智慧」用白話的方式來說，就是一種能夠根據人類的指令，生成文字或影像等內容的技術。</div>
+        </div>
+
+        <div class="cihui-group">
+            <div class="cihui-title">藉由 method 來 goal</div>
+            <div class="lijv">藉由人工智慧來學習外語，不僅省時省力，還能夠針對我的需求進行客製化的調整。</div>
+            <div class="lijv">這家公司曾經引發巨大的爭議，因為他們藉由知名畫師的繪畫作品來訓練自家的人工智慧模型。</div>
+        </div>
+
+        <div class="cihui-group">
+            <div class="cihui-title">儘管...，但是 S. 仍然...</div>
+            <div class="lijv">儘管使用人工智慧來學習外語能夠節省許多時間，但是對於教育產業所帶來的衝擊仍然不容忽視。</div>
+            <div class="lijv">儘管你提到的部分有一定的道理，但是我仍然堅持原本的立場。</div>
+        </div>
+
+        <div class="cihui-group">
+            <div class="cihui-title">產生...的問題</div>
+            <div class="lijv">若是讓人工智慧包辦所有需要思考的工作，最後就可能產生嚴重的腦力退化的問題。</div>
+            <div class="lijv">這項政策在實施後產生許多棘手的問題，讓相關部門措手不及。</div>
+        </div>
+
+        <div class="cihui-group">
+            <div class="cihui-title">在理想的情況下、在極端的情況下</div>
+            <div class="lijv">在理想的情況下，人工智慧的發展能夠大幅改善人類的生活。</div>
+            <div class="lijv">在極端的情況下，人工智慧的應用也可能帶來意想不到的風險。</div>
+        </div>
+
+        <div class="cihui-group">
+            <div class="cihui-title">將 sth 應用於...的領域</div>
+            <div class="lijv">這家公司正計畫要將人工智慧應用於醫療診斷的領域，希望能藉此提供更為便宜且便捷的醫療服務。</div>
+            <div class="lijv">政府已經將人工智慧應用於交通管理的領域，許多重要的路口都透過人工智慧來動態調整紅綠燈的持續時間，減少交通堵塞的問題。</div>
+        </div>
+
+        <div class="cihui-group">
+            <div class="cihui-title">培養...的習慣 / 能力</div>
+            <div class="lijv">長期依賴讓 AI 做摘要的學習方式，可能會讓學生失去培養閱讀理解能力的機會。</div>
+            <div class="lijv">外語學習者在日常生活練習使用課本中的詞彙句型，能培養用外語思考的習慣。</div>
+        </div>
+
+        <div class="cihui-group">
+            <div class="cihui-title">制定...的法律 / 政策</div>
+            <div class="lijv">為了因應科技的快速發展，各國紛紛針對人工智慧的應用制定相關的倫理政策。</div>
+            <div class="lijv">政府正討論是否要制定保護個資的法律，以應對科技快速發展帶來的風險。</div>
+        </div>
+
+        <div class="cihui-group">
+            <div class="cihui-title">針對 issue 我們應該 suggestion，如此一來就能 achievement；否則可能會 consequence 。</div>
+            <div class="lijv">針對學生過度依賴 AI 寫作業的現象，我們應該設計更多需要口頭報告與實作的課程，如此一來就能確保他們真正吸收了知識；否則可能會導致學生喪失獨立思考與解決問題的能力。</div>
+            <div class="lijv">針對長期使用電子產品造成的視力衰退，我們應該嚴格執行每三十分鐘休息的原則，如此一來就能有效減緩眼睛疲勞與近視加深；否則可能會提早引發乾眼症或視網膜病變等健康危機。</div>
+        </div>
+
+       
+
+        <div id="supplementary-section">
+            <div class="vocab-title-blue">🔷 藍色詞彙表 (看不懂的詞)</div>
+            <table class="vocab-table" id="blue-vocab-table">
+                <thead>
+                    <tr>
+                        <th style="width: 15%;">詞彙</th>
+                        <th style="width: 20%;">拼音 (Pinyin)</th>
+                        <th style="width: 25%;">英文翻譯 (English)</th>
+                        <th style="width: 40%;">例句 (Example Sentence)</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+
+            <div class="vocab-title-yellow">🔶 黃色詞彙表 (文章的關鍵詞)</div>
+            <table class="vocab-table" id="yellow-vocab-table">
+                <thead>
+                    <tr>
+                        <th style="width: 15%;">詞彙</th>
+                        <th style="width: 20%;">拼音 (Pinyin)</th>
+                        <th style="width: 25%;">英文翻譯 (English)</th>
+                        <th style="width: 40%;">例句 (Example Sentence)</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+    </div>
+
+
+    
+    <script>
+        let currentMode = 'knife';
+        let historyStack = [];
+        let dictReady = false;
+        let dictDB = null;
+        let fallbackDict = {};
+        const CEDICT_JSON_URL = 'https://raw.githubusercontent.com/cfour-hi/cedict/master/cdict-min.json';
+
+        // 備選小型字典（當網路失敗時使用）
+        const fallbackDictionary = {
+            "ChatGPT": { pinyin: "ChatGPT", english: "An AI conversational chatbot developed by OpenAI.", example: "自 ChatGPT 問世以來，各式各樣的 AI 工具如雨後春筍般層出不窮。" },
+            "問世": { pinyin: "wèn shì", english: "To be published; to come out; to be introduced to the market.", example: "這款全新的人工智慧軟體問世後，迅速引發了全球使用熱潮。" },
+            "各式各樣": { pinyin: "gèshigèyang", english: "All kinds of; various; a great variety of.", example: "展覽會上有各式各樣的創新機器人，吸引了大量大眾註足。" },
+            "雨後春筍": { pinyin: "yǔ hòu chūn sǔn", english: "Springing up like bamboo shoots after rain; multiplying rapidly.", example: "隨著智慧型手機的普及，各類行動應用程式如雨後春筍般湧現。" },
+            "層出不窮": { pinyin: "céng chū bù qióng", english: "Emerge endlessly; occur one after another.", example: "網路詐騙手段層出不窮，我們在線上互動時必須保持警惕。" },
+            "方方面面": { pinyin: "fāng fāng miàn miàn", english: "All aspects; every side; all dimensions.", example: "人工智慧的技術已經深入到我們日常生活的方方面面。" },
+            "外語": { pinyin: "wài yǔ", english: "Foreign language.", example: "精通一門外語能夠為個人的職涯發展帶來更多跨國發展的機會。" },
+            "避之唯恐不及": { pinyin: "bì zhī wéi kǒng bù jí", english: "Avoid like the plague; try to avoid by all means.", example: "面對突如其來的嚴重傳染病，大家對公共場所都是避之唯恐不及。" },
+            "平易近人": { pinyin: "píng yì jìn rén", english: "Approachable; simple and easy to understand; humble.", example: "李老師教學風格平易近人，深得全體學生的喜愛與尊敬。" },
+            "自學": { pinyin: "zì xué", english: "Self-study; self-taught; independent learning.", example: "他透過網路上的開放式教育資源，成功自學了高級程式設計。" },
+            "踩坑": { pinyin: "cǎi kēng", english: "Encounter hidden snags; step into pitfalls; learn from trial and error.", example: "這本自學指南分享了許多前人的踩坑經驗，能幫你少走彎路。" },
+            "冤枉路": { pinyin: "yuān wǎng lù", english: "Detour; useless or fruitless journey; wasted effort.", example: "有經驗豐富的導師引領，初學者在研習過程中就能少走冤枉路。" },
+            "生成式人工智慧": { pinyin: "shēng chéng shì rén gōng zhì huì", english: "Generative Artificial Intelligence (Generative AI).", example: "生成式人工智慧具備自主產出高階文字、影像與音樂內容的能力。" },
+            "核心技術": { pinyin: "hé xīn jì shù", english: "Core technology.", example: "自主研發的核心技術是這家科技公司在市場上立於不敗之地的關鍵。" },
+            "大語言模型": { pinyin: "dà yǔ yán mó xíng", english: "Large Language Model (LLM).", example: "大語言模型利用海量的文本數據進行深度學習與預測訓練。" },
+            "對話機器人": { pinyin: "duì huà jī qì rén", english: "Chatbot; conversational agent.", example: "這家銀行的網站設置了24小時在線的對話機器人來解答一般客戶問題。" },
+            "造句接龍": { pinyin: "zào jù jiē lóng", english: "Sentence-making solitaire game.", example: "語文課上，老師透過造句接龍的方式來訓練學生的即時口語反應。" },
+            "克漏字填空": { pinyin: "kè lòu zì tián kòng", english: "Cloze test; fill-in-the-blanks exercise.", example: "克漏字填空是評估學習者全面語境理解能力的常用測驗形式。" },
+            "語法規則": { pinyin: "yǔ fǎ guī zé", english: "Grammatical rules; grammar guidelines.", example: "學習外語不只要死記語法規則，更重要的是進行大量的語境實踐。" },
+            "觀念混淆": { pinyin: "guān niàn hùn xiáo", english: "Conceptual confusion; misunderstanding.", example: "如果沒有釐清核心理論，在做進階應用題時就很容易產生觀念混淆。" },
+            "幻覺": { pinyin: "huàn jué", english: "Hallucination (AI system outputting false or misleading data).", example: "大型語言模型有時會提供虛假的事實，這種問題在科技界被稱為幻覺。" },
+            "唯一標準": { pinyin: "wéi yī biāo zhǔn", english: "The sole criterion; the only standard.", example: "分數高低絕不是衡量一個學生創新思維與整體實力的唯一標準。" },
+            "摘要": { pinyin: "zhāi yào", english: "Summary; abstract; digest.", example: "請在閱讀完這篇長篇學術報告後，用三百字寫出它的核心摘要。" },
+            "重複性": { pinyin: "chóng fù xìng", english: "Repetitiveness; repetitive nature.", example: "自動化工具最適合用來代替人類處理那些重複性高的繁瑣工作。" },
+            "思考": { pinyin: "sī kǎo", english: "To think; to ponder; reflection.", example: "教育的終極目的，是教會學生如何獨立思考，而非盲目接受資訊。" },
+            "助力": { pinyin: "zhù lì", english: "Booster; assistance; driving force.", example: "數位科技若使用得當，將會成為現代課堂上高效率教學的巨大助力。" },
+            "阻力": { pinyin: "zǔ lì", english: "Resistance; obstacle; drag.", example: "任何新政策在推行初期，都免不了會遇到來自傳統觀念的阻力。" }
+        };
+        fallbackDict = fallbackDictionary;
+
+        // ===== IndexedDB 字典管理模組 =====
+        // 初始化 IndexedDB 數據庫
+        async function initDictDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open('CedictDB', 1);
+
+                request.onerror = () => reject(request.error);
+                request.onsuccess = () => {
+                    dictDB = request.result;
+                    checkDictExists().then(exists => {
+                        if (exists) dictReady = true;
+                        downloadCedictInBackground();
+                        resolve(dictDB);
+                    });
+                };
+
+                request.onupgradeneeded = (event) => {
+                    const db = event.target.result;
+                    if (!db.objectStoreNames.contains('entries')) {
+                        db.createObjectStore('entries', { keyPath: 'simplified' });
+                    }
+                    if (!db.objectStoreNames.contains('metadata')) {
+                        db.createObjectStore('metadata', { keyPath: 'key' });
+                    }
+                };
+            });
+        }
+
+        // 檢查字典是否已存在
+        function checkDictExists() {
+            return new Promise((resolve) => {
+                if (!dictDB) { resolve(false); return; }
+                const tx = dictDB.transaction('metadata', 'readonly');
+                const store = tx.objectStore('metadata');
+                const request = store.get('lastUpdated');
+                request.onsuccess = () => resolve(!!request.result);
+                request.onerror = () => resolve(false);
+            });
+        }
+
+        // 從 IndexedDB 查詢單個詞彙
+        function queryDictDB(word) {
+            return new Promise((resolve) => {
+                if (!dictDB) { resolve(null); return; }
+                const tx = dictDB.transaction('entries', 'readonly');
+                const store = tx.objectStore('entries');
+                const request = store.get(word);
+                request.onsuccess = () => resolve(request.result || null);
+                request.onerror = () => resolve(null);
+            });
+        }
+
+        // 寫入批量詞彙到 IndexedDB
+        function saveDictBatch(entries) {
+            return new Promise((resolve, reject) => {
+                if (!dictDB) { reject('DB not ready'); return; }
+                const tx = dictDB.transaction('entries', 'readwrite');
+                const store = tx.objectStore('entries');
+                entries.forEach(entry => {
+                    store.put(entry);
+                });
+                tx.oncomplete = () => resolve();
+                tx.onerror = () => reject(tx.error);
+            });
+        }
+
+        // 更新 metadata（標記下載完成）
+        function updateDictMetadata() {
+            return new Promise((resolve, reject) => {
+                if (!dictDB) { reject('DB not ready'); return; }
+                const tx = dictDB.transaction('metadata', 'readwrite');
+                const store = tx.objectStore('metadata');
+                store.put({ key: 'lastUpdated', timestamp: Date.now(), status: 'complete' });
+                tx.oncomplete = () => {
+                    dictReady = true;
+                    resolve();
+                };
+                tx.onerror = () => reject(tx.error);
+            });
+        }
+
+        // 背景下載 CC-CEDICT
+        async function downloadCedictInBackground() {
+            try {
+                const response = await fetch(CEDICT_JSON_URL);
+                if (!response.ok) throw new Error('網路錯誤');
+
+                const jsonData = await response.json();
+                const entries = Array.isArray(jsonData) ? jsonData : Object.entries(jsonData).map(([simp, data]) => ({
+                    simplified: simp,
+                    traditional: data.traditional || simp,
+                    pinyin: data.pinyin || '',
+                    definitions: Array.isArray(data.definitions) ? data.definitions : [data.definitions || ''],
+                    english: (Array.isArray(data.definitions) ? data.definitions.join('; ') : data.definitions) || ''
+                }));
+
+                // 分批寫入（每 1000 條）
+                for (let i = 0; i < entries.length; i += 1000) {
+                    const batch = entries.slice(i, i + 1000);
+                    await saveDictBatch(batch);
+                }
+
+                // 標記下載完成
+                await updateDictMetadata();
+                console.log('✓ CC-CEDICT 字典加載完成');
+            } catch (error) {
+                console.error('字典下載失敗：', error);
+                // 降級到備選字典
+                dictReady = true;
+            }
+        }
+
+        // 0. 網頁加載時初始化字典
+        window.addEventListener('DOMContentLoaded', async () => {
+            try {
+                await initDictDB();
+            } catch (error) {
+                console.error('字典初始化失敗：', error);
+            }
+            const articles = document.querySelectorAll('.article-content');
+            const punctRegex = /([，。\(\)]+)/g;
+
+            articles.forEach(art => {
+                const text = art.innerText.trim();
+                
+                const row = document.createElement('div');
+                row.className = 'paragraph-row';
+                row.dataset.original = text;
+                
+                const articleBox = document.createElement('div');
+                articleBox.className = 'article-box';
+                
+                const tokens = text.split(punctRegex).filter(t => t !== '');
+                
+                tokens.forEach(token => {
+                    if (punctRegex.test(token) || /^[，、。！？；：、「」『』（）\(\)\s]+$/.test(token)) {
+                        const punctSpan = document.createElement('span');
+                        punctSpan.className = 'punct';
+                        punctSpan.innerText = token;
+                        articleBox.appendChild(punctSpan);
+                    } else {
+                        const block = document.createElement('span');
+                        block.className = 'word-block';
+                        
+                        token.split('').forEach(char => {
+                            const cSpan = document.createElement('span');
+                            cSpan.className = 'char';
+                            cSpan.innerText = char;
+                            block.appendChild(cSpan);
+                        });
+                        articleBox.appendChild(block);
+                    }
+                });
+                
+                const textarea = document.createElement('textarea');
+                textarea.className = 'summary-box';
+                textarea.placeholder = '請在此輸入這個段落的摘要、大意';
+                textarea.addEventListener('blur', () => saveState());
+                
+                row.appendChild(articleBox);
+                row.appendChild(textarea);
+                
+                art.parentNode.insertBefore(row, art);
+                art.parentNode.removeChild(art);
+            });
+            
+            saveState();
+        }, { once: true });
+
+        // 2. 歷史軌跡控制
+        function saveState() {
+            const state = [];
+            document.querySelectorAll('.paragraph-row').forEach(row => {
+                state.push({
+                    html: row.querySelector('.article-box').innerHTML,
+                    summary: row.querySelector('.summary-box').value
+                });
+            });
+            historyStack.push(JSON.stringify(state));
+            if (historyStack.length > 35) historyStack.shift();
+        }
+
+        function undo() {
+            if (historyStack.length <= 1) {
+                alert("已回到最原始狀態，沒有上一步了！");
+                return;
+            }
+            historyStack.pop();
+            const prevState = JSON.parse(historyStack[historyStack.length - 1]);
+            document.querySelectorAll('.paragraph-row').forEach((row, idx) => {
+                row.querySelector('.article-box').innerHTML = prevState[idx].html;
+                row.querySelector('.summary-box').value = prevState[idx].summary;
+            });
+        }
+
+        // 3. 工具模式切換
+        function setMode(mode, btn) {
+            currentMode = mode;
+            document.querySelectorAll('.btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            document.body.className = mode + '-mode';
+        }
+
+        // 4. 全局點擊互動監聽
+        document.addEventListener('click', (e) => {
+            if (currentMode === 'knife' && e.target.classList.contains('char')) {
+                const charSpan = e.target;
+                const currentBlock = charSpan.closest('.word-block');
+                if (!currentBlock) return;
+                
+                const allChars = Array.from(currentBlock.querySelectorAll('.char'));
+                const clickIdx = allChars.indexOf(charSpan);
+                
+                if (clickIdx === allChars.length - 1) return;
+                
+                saveState();
+
+                const leftPart = allChars.slice(0, clickIdx + 1);
+                const rightPart = allChars.slice(clickIdx + 1);
+                const originalClasses = Array.from(currentBlock.classList).join(' ');
+                
+                const createNewBlock = (chars) => {
+                    const block = document.createElement('span');
+                    block.className = originalClasses;
+                    chars.forEach(c => block.appendChild(c.cloneNode(true)));
+                    return block;
+                };
+
+                const b1 = createNewBlock(leftPart);
+                const b2 = createNewBlock(rightPart);
+                
+                currentBlock.parentNode.insertBefore(b1, currentBlock);
+                currentBlock.parentNode.insertBefore(b2, currentBlock);
+                currentBlock.parentNode.removeChild(currentBlock);
+                return;
+            }
+
+            const clickedBlock = e.target.closest('.word-block');
+            if (clickedBlock && currentMode !== 'knife') {
+                saveState();
+                
+                if (currentMode === 'paint-blue') {
+                    clickedBlock.classList.add('has-blue');
+                } else if (currentMode === 'paint-yellow') {
+                    clickedBlock.classList.add('has-yellow');
+                } else if (currentMode === 'bold') {
+                    clickedBlock.classList.toggle('is-bold');
+                } else if (currentMode === 'erase') {
+                    clickedBlock.classList.remove('has-blue', 'has-yellow', 'is-bold');
+                }
+            }
+        });
+
+        // 5. 智慧字典查詢與上下文自動擷取例句（改為異步）
+        async function queryWordDetails(word, blockEl) {
+            // 優先查詢 IndexedDB
+            if (dictReady && dictDB) {
+                const dbResult = await queryDictDB(word);
+                if (dbResult) {
+                    return {
+                        pinyin: dbResult.pinyin || '',
+                        english: dbResult.english || '',
+                        example: dbResult.example || `課文中使用了「${word}」。`
+                    };
+                }
+            }
+
+            // 次優先查詢備選字典
+            if (fallbackDict[word]) return fallbackDict[word];
+
+            // 降級：自動擷取上下文
+            let contextSentence = "";
+            if (blockEl) {
+                const parentRow = blockEl.closest('.paragraph-row');
+                if (parentRow && parentRow.dataset.original) {
+                    const allSentences = parentRow.dataset.original.split(/[。，！？]/);
+                    const matched = allSentences.find(s => s.includes(word));
+                    if (matched) contextSentence = matched.trim() + "。";
+                }
+            }
+            if (!contextSentence) contextSentence = `課文分析單元中包含「${word}」的上下文脈絡。`;
+
+            return {
+                pinyin: "（字典沒有這個詞）",
+                english: "That word isn't in the dictionary.",
+                example: contextSentence
+            };
+        }
+
+        // 6. 彙整生成分析圖表（改為異步）
+        async function buildVocabTables() {
+            const blueBody = document.querySelector('#blue-vocab-table tbody');
+            const yellowBody = document.querySelector('#yellow-vocab-table tbody');
+            blueBody.innerHTML = '';
+            yellowBody.innerHTML = '';
+
+            const collectedBlue = new Set();
+            const collectedYellow = new Set();
+            const blueElements = {};
+            const yellowElements = {};
+
+            document.querySelectorAll('.word-block').forEach(block => {
+                const wordText = block.innerText.trim();
+                if (!wordText) return;
+
+                if (block.classList.contains('has-blue')) {
+                    collectedBlue.add(wordText);
+                    blueElements[wordText] = block;
+                }
+                if (block.classList.contains('has-yellow')) {
+                    collectedYellow.add(wordText);
+                    yellowElements[wordText] = block;
+                }
+            });
+
+            // 異步查詢所有詞彙並生成表格
+            for (const word of collectedBlue) {
+                const info = await queryWordDetails(word, blueElements[word]);
+                blueBody.innerHTML += `<tr>
+                    <td><strong>${word}</strong></td>
+                    <td>${info.pinyin}</td>
+                    <td>${info.english}</td>
+                    <td>${info.example}</td>
+                </tr>`;
+            }
+            if(collectedBlue.size === 0) {
+                blueBody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#888;">尚未標記任何「看不懂的詞彙」</td></tr>`;
+            }
+
+            for (const word of collectedYellow) {
+                const info = await queryWordDetails(word, yellowElements[word]);
+                yellowBody.innerHTML += `<tr>
+                    <td><strong>${word}</strong></td>
+                    <td>${info.pinyin}</td>
+                    <td>${info.english}</td>
+                    <td>${info.example}</td>
+                </tr>`;
+            }
+            if(collectedYellow.size === 0) {
+                yellowBody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#888;">尚未標記任何「關鍵詞彙」</td></tr>`;
+            }
+
+            document.getElementById('supplementary-section').style.display = 'block';
+        }
+
+        // 7. 核心修改：動態計算長度之一頁流 PDF 匯出模組
+        async function exportPDF() {
+            // A. 確保字典已就緒（若下載中，等待完成）
+            let retries = 0;
+            while (!dictReady && retries < 60) {
+                await new Promise(r => setTimeout(r, 1000));
+                retries++;
+            }
+
+            // B. 匯出前自動跑雙色表格彙整
+            await buildVocabTables(); 
+
+            // C. 動態調整所有摘要輸入框（textarea）的高度
+            document.querySelectorAll('.summary-box').forEach(textarea => {
+                textarea.style.height = 'auto'; 
+                textarea.style.height = (textarea.scrollHeight + 6) + 'px'; 
+            });
+
+            // D. 刪除舊的動態樣式，避免重複累積
+            const oldStyle = document.getElementById('dynamic-pdf-size');
+            if (oldStyle) oldStyle.remove();
+
+            // E. 智慧量測：即時抓取學習單容器（#print-area）的實際總高度
+            const printArea = document.getElementById('print-area');
+            const dynamicHeightPx = printArea.offsetHeight + 120; // 額外補 120px 作為上下緩衝留白
+
+            // F. 動態注入 CSS 變數到 @media print
+            const style = document.createElement('style');
+            style.id = 'dynamic-pdf-size';
+            style.innerHTML = `
+                @media print {
+                    @page {
+                        size: 1150px ${dynamicHeightPx}px;
+                        margin: 0 !important; /* 清除瀏覽器預設頁邊距 */
+                    }
+                    body {
+                        padding: 20px !important;
+                        margin: 0 !important;
+                        background-color: #ffffff !important;
+                    }
+                    .worksheet-container {
+                        width: 1150px !important;
+                        max-width: 1150px !important;
+                        padding: 20px !important;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+
+            // G. 呼進瀏覽器原生列印視窗
+            window.print();
+        }
+    </script>
+</body>
+</html>
+    
+  </body>
+  
+</html>
