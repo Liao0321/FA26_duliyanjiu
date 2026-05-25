@@ -1,15 +1,4 @@
 <!DOCTYPE html>
-<html lang="en">
-
-  <head>
-    <meta charset="UTF-8">
-    <title>WK1</title>
-    
-
-  </head>
-    
-  <body>
-  <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
@@ -131,21 +120,21 @@
            ========================================== */
         .target-box {
             padding: 28px 32px;
-            margin-bottom: 40px;
+            margin-bottom: 3px;
             position: relative;
             text-align: center;
             background-color: #ffffff;
-            background-image: url('https://i.postimg.cc/6pd1yvDj/kuang-xian.png');
-            background-position: center;
+            background-image: url('https://i.postimg.cc/ZKhFDsWZ/image.png');
+            background-position: top center;
             background-repeat: no-repeat;
-            background-size: 100% auto;
-            padding-bottom: 120px;
+            background-size: auto;
+            padding-bottom: 1px;
             background-attachment: scroll;
             min-height: 600px;
         }
 
         .target-box h1 {
-            font-size: 2rem;
+            font-size: 32px;
             font-weight: bold;
             letter-spacing: 3px;
             margin: 0px 0px 18px 0px;
@@ -155,7 +144,7 @@
         }
 
         .target-box h1::before, .target-box h1::after {
-            content: "◇";
+            content: "";
             display: inline-block;
             margin: 0 12px;
             font-size: 0.8rem;
@@ -163,14 +152,16 @@
 
         .target-list {
             list-style: disc;
-            font-size: 1.2rem;
+            font-size: 20px;
             color: #000000;
-            position: relative;
             line-height: 2;
             text-align: left;
-            top: 70px;
-            padding-left: 30px;
-            padding-right: 10px;
+            margin-top: 50px;
+            margin-left: 60px;
+            margin-right: 20px;
+            display: inline-block;
+            flex-shrink: 0;
+            min-width: 600px;
         }
 
         .target-list li { margin-bottom: 15px; }
@@ -211,7 +202,7 @@
             border-radius: 4px;
             font-size: 0.9rem;
             font-family: inherit;
-            background-color: #ffffff;
+            background-color: #fffdf9;
             color: #000000;
             transition: border-color 0.2s, background-color 0.2s;
         }
@@ -319,18 +310,6 @@
         .cihui-title { font-size: 1.1rem; font-weight: bold; margin-bottom: 8px; display: flex; align-items: center; }
         .cihui-title::before { content: "•"; margin-right: 8px; }
         .lijv { width: 100%; height: auto; background-color: #f4efe6; border-radius: 6px; padding: 15px; margin-bottom: 10px; }
-        .quiz-container { border: 2px solid #000000; margin-top: 20px; }
-        .quiz-header { display: flex; border-bottom: 2px solid #000000; background-color: #ffffff; text-align: center; font-weight: bold; font-size: 0.95rem; }
-        .quiz-header div { flex: 1; padding: 8px 0; border-right: 1px solid #000000; }
-        .quiz-header div:last-child { border-right: none; }
-        .quiz-body { display: flex; }
-        .quiz-sidebar { width: 40px; border-right: 2px solid #000000; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.1rem; writing-mode: vertical-rl; letter-spacing: 4px; background-color: #ffffff; }
-        .quiz-text { flex: 1; padding: 20px; font-size: 1.05rem; text-align: justify; line-height: 2; }
-        .blank-space { display: inline-block; width: 50px; border-bottom: 1px solid #000000; text-align: center; margin: 0 4px; font-weight: bold; background-color: #fff9e6; }
-        .answer-table { width: 100%; border-collapse: collapse; margin-top: -2px; }
-        .answer-table td { border: 2px solid #000000; text-align: center; padding: 10px; font-size: 1rem; }
-        .answer-table tr:first-child td { font-weight: bold; background-color: #ffffff; width: 20%; }
-        .answer-table tr:last-child td { height: 45px; }
 
         /* ==========================================
            PDF 匯出專用自動補充詞彙表
@@ -338,7 +317,7 @@
         #supplementary-section { margin-top: 50px; display: none; }
         .vocab-table { width: 100%; border-collapse: collapse; margin-top: 15px; margin-bottom: 35px; font-size: 1rem; background-color: #ffffff; }
         .vocab-table th, .vocab-table td { border: 1px solid #cbd5e1; padding: 12px 14px; text-align: left; line-height: 1.6; }
-        .vocab-table th { background-color: #f1f5f9; color: #1e293b; font-weight: bold; }
+        .vocab-table th { background-color: #f1f5f9; color: #1e293b; font-weight: bold; text-align: center;}
         .vocab-title-blue { color: #1d4ed8; border-left: 5px solid #2563eb; padding-left: 10px; margin-bottom: 10px; font-size: 1.4rem; font-weight: bold; }
         .vocab-title-yellow { color: #a16207; border-left: 5px solid #eab308; padding-left: 10px; margin-bottom: 10px; font-size: 1.4rem; font-weight: bold; }
 
@@ -1013,8 +992,4 @@
         }
     </script>
 </body>
-</html>
-    
-  </body>
-  
 </html>
