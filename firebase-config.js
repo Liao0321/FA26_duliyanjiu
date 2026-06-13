@@ -9,14 +9,28 @@
  * 5. 在 `TEACHER_EMAILS` 中填入老師的學校 Google 信箱。
  */
 
+
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT_ID.firebasestorage.app",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyBpLqmNDcqnph59L_t-NPKrVakz93MKbTs",
+  authDomain: "cihuilianxi.firebaseapp.com",
+  projectId: "cihuilianxi",
+  storageBucket: "cihuilianxi.firebasestorage.app",
+  messagingSenderId: "643003689518",
+  appId: "1:643003689518:web:ed7dd5b10f33ae5c5c4dbf",
+  measurementId: "G-SMT8V1PKCD"
 };
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
 
 // 老師的電子信箱清單（登入時自動辨識為教師身分並顯示管理後台）
 const TEACHER_EMAILS = [
