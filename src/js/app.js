@@ -13,8 +13,8 @@ export const AppState = {
   currentView: 'dashboard'
 };
 
-// 進入點初始化
-document.addEventListener('DOMContentLoaded', () => {
+// 進入點初始化 (防範 DOMContentLoaded 已經觸發過的安全寫法)
+function initAll() {
   initAppRouter();
   setupAuthListeners();
   
@@ -23,7 +23,13 @@ document.addEventListener('DOMContentLoaded', () => {
     showToast('Firebase 設定成功，正在重新整理網頁...', 'info');
     setTimeout(() => window.location.reload(), 1500);
   });
-});
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initAll);
+} else {
+  initAll();
+}
 
 /**
  * 初始化前端 Hash 路由
