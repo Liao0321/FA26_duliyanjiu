@@ -58,7 +58,7 @@
       <nav class="nav-menu">
         <a href="#/dashboard" class="nav-item active" data-view="dashboard">
           <span class="material-icons-round">dashboard</span>
-          <span>個人儀表板</span>
+          <span>首頁</span>
         </a>
         <a href="#/practice" class="nav-item" data-view="practice">
           <span class="material-icons-round">style</span>
@@ -71,6 +71,10 @@
         <a href="#/leaderboard" class="nav-item" data-view="leaderboard">
           <span class="material-icons-round">leaderboard</span>
           <span>排行榜</span>
+        </a>
+        <a href="#/custom-vocab" class="nav-item" data-view="custom-vocab">
+          <span class="material-icons-round">bookmarks</span>
+          <span>自訂詞彙庫</span>
         </a>
         <a href="#/teacher" id="nav-teacher-btn" class="nav-item hidden" data-view="teacher">
           <span class="material-icons-round">admin_panel_settings</span>
@@ -112,7 +116,7 @@
         <!-- 1. 儀表板頁面 -->
         <section id="view-dashboard" class="app-view">
           <div class="view-header">
-            <h2>個人儀表板</h2>
+            <h2>首頁</h2>
             <p>追蹤您的學習進度與每日 Streak</p>
           </div>
           
@@ -149,6 +153,17 @@
                 <p>今日待練習詞彙</p>
               </div>
             </div>
+
+            <!-- 自訂詞彙卡片 -->
+            <a href="#/custom-vocab" class="dash-card custom-vocab-card" style="text-decoration: none; color: inherit;">
+              <div class="card-icon book-icon" style="background-color: rgba(168, 85, 247, 0.15); color: #c084fc;">
+                <span class="material-icons-round">bookmarks</span>
+              </div>
+              <div class="card-info">
+                <h3 id="custom-vocab-count">0</h3>
+                <p>自訂詞彙數量 (跨裝置同步)</p>
+              </div>
+            </a>
           </div>
 
           <div class="dashboard-content-layout">
@@ -167,11 +182,13 @@
             <div class="content-panel info-panel">
               <div class="panel-header">
                 <span class="material-icons-round icon-blue">lightbulb</span>
-                <h3>間隔重複學習提示 (SRS)</h3>
+                <h3>💡 閃卡學習小撇步</h3>
               </div>
-              <div class="panel-body">
-                <p>本系統使用 7 階段間隔重複記憶法。每次您在閃卡練習中點選「記住了」，單字就會升級。成功累積 <strong>7 次記住時間</strong> 之後，該單字即會被歸類為「已熟記」，不再重複出現在每日字卡中。</p>
-                <p>若在 24 小時內剛升級的單字被點選「忘記了」，會受到<strong>降級處罰</strong>，幫助您重新加強記憶！</p>
+              <div class="panel-body" style="font-size: 0.9rem; line-height: 1.6;">
+                <p style="margin-bottom: 0.75rem;"><strong>怎麼把單字記熟？</strong><br>
+                在「閃卡練習」中，如果對卡片有印象，請點選 <span style="color: var(--color-success); font-weight: 600;">記住了</span>，單字的熟練度就會升級。累積<strong>成功記住 7 次</strong>之後，該單字就會被歸類為「已熟記」，不會再重複出現在日常練習中囉！</p>
+                <p><strong>忘記了該怎麼辦？</strong><br>
+                別擔心！點選 <span style="color: var(--color-danger); font-weight: 600;">忘記了</span>，系統會特別幫你標記，並在之後的練習中更頻繁、優先地抽出來讓你複習，直到你完全記住為止！</p>
               </div>
             </div>
           </div>
@@ -432,18 +449,47 @@
             <div class="content-panel import-panel">
               <div class="panel-header">
                 <span class="material-icons-round">content_paste</span>
-                <h3>批次複製貼上匯入 (Google Sheets)</h3>
+                <h3>批次匯入教科書詞彙 (Google Sheets)</h3>
               </div>
               <div class="panel-body">
-                <p class="helper-text">
-                  請在 Google Sheets 中選取並複製以下順序的資料列（注意：第一列<strong>請勿包含標題列</strong>，直接從第二列資料開始複製）：<br>
-                  <code>中文詞彙 | 搭配詞 | 中文例句 | 英文例句 | 課別標籤 | 圖片檔名 (選填) | 單字音檔檔名 (選填) | 例句音檔檔名 (選填)</code>
-                </p>
-                <textarea id="import-paste-area" placeholder="在此貼上您從 Google Sheet 複製的內容..."></textarea>
-                <div class="import-actions">
-                  <button id="import-parse-btn" class="btn btn-primary">
-                    <span class="material-icons-round">analytics</span> 解析貼上內容
-                  </button>
+                <!-- Tab 選項 -->
+                <div class="console-tabs">
+                  <button id="tab-sheet-url" class="console-tab active">Google Sheet 連結匯入</button>
+                  <button id="tab-raw-paste" class="console-tab">複製貼上文字匯入</button>
+                </div>
+
+                <!-- 1. Google Sheet URL 匯入面板 -->
+                <div id="panel-sheet-url" class="import-tab-content">
+                  <p class="helper-text">
+                    請輸入 Google Sheet 試算表連結。請確保您的試算表已設定共享為<strong>「知道連結的任何人均可檢視」</strong>，或者點選檔案選單中的<strong>「發布到網路」</strong>。<br>
+                    欄位順序請符合：<code>單字 | 搭配詞 | 中文例句 | 英文例句 | 課別標籤 | 圖片檔名 | 單字音檔 | 例句音檔</code>
+                  </p>
+                  <div class="form-group">
+                    <input type="text" id="import-sheet-url" placeholder="請貼上 Google Sheet 共享網址..." autocomplete="off">
+                  </div>
+                  <div class="import-actions" style="margin-bottom: 0.5rem;">
+                    <button id="import-sheet-btn" class="btn btn-primary" style="width: 100%;">
+                      <span class="material-icons-round">cloud_download</span> 讀取並解析試算表
+                    </button>
+                  </div>
+                </div>
+
+                <!-- 2. 複製貼上文字匯入面板 -->
+                <div id="panel-raw-paste" class="import-tab-content hidden">
+                  <p class="helper-text">
+                    請在 Google Sheets 中選取並複製以下順序的資料列（注意：第一列<strong>請勿包含標題列</strong>，直接從資料列開始複製）：<br>
+                    <code>單字 | 搭配詞 | 中文例句 | 英文例句 | 課別標籤 | 圖片檔名 (選填) | 單字音檔 (選填) | 例句音檔 (選填)</code>
+                  </p>
+                  <textarea id="import-paste-area" placeholder="在此貼上您從 Google Sheet 複製的內容..."></textarea>
+                  <div class="import-actions" style="margin-bottom: 0.5rem;">
+                    <button id="import-parse-btn" class="btn btn-primary" style="width: 100%;">
+                      <span class="material-icons-round">analytics</span> 解析貼上內容
+                    </button>
+                  </div>
+                </div>
+
+                <!-- 共同上傳按鈕 -->
+                <div id="common-upload-container" style="border-top: 1px dashed var(--border-glass); padding-top: 1rem; margin-top: 1rem; display: flex; justify-content: flex-end;">
                   <button id="import-upload-btn" class="btn btn-success btn-glow hidden">
                     <span class="material-icons-round">cloud_upload</span> 上傳至雲端字庫
                   </button>
@@ -488,6 +534,70 @@
           </div>
         </section>
 
+        <!-- 我的自訂詞彙頁面 -->
+        <section id="view-custom-vocab" class="app-view hidden">
+          <div class="view-header">
+            <h2>自訂詞彙庫</h2>
+            <p>在此新增與管理您的個人專屬詞彙，系統將進行跨裝置雲端同步並融入日常閃卡練習與挑戰中</p>
+          </div>
+
+          <div class="custom-vocab-grid">
+            <!-- 新增自訂詞彙表單 -->
+            <div class="content-panel">
+              <div class="panel-header">
+                <span class="material-icons-round" style="color: var(--accent-primary);">add_circle</span>
+                <h3>新增自訂詞彙</h3>
+              </div>
+              <div class="panel-body">
+                <form id="custom-vocab-form">
+                  <div class="form-group">
+                    <label for="custom-word">中文詞彙 <span style="color:var(--color-danger)">*</span></label>
+                    <input type="text" id="custom-word" placeholder="例如：蘋果" required autocomplete="off">
+                  </div>
+                  <div class="form-group">
+                    <label for="custom-collocation">詞彙的英文翻譯 <span style="color:var(--color-danger)">*</span></label>
+                    <input type="text" id="custom-collocation" placeholder="例如：apple" required autocomplete="off">
+                  </div>
+                  <div class="form-group">
+                    <label for="custom-sentence">中文例句 <span style="color:var(--color-danger)">*</span></label>
+                    <input type="text" id="custom-sentence" placeholder="例如：這是一個蘋果。" required autocomplete="off">
+                  </div>
+                  <div class="form-group">
+                    <label for="custom-sentence-en">例句的英文翻譯 <span style="color:var(--color-danger)">*</span></label>
+                    <input type="text" id="custom-sentence-en" placeholder="例如：This is an apple." required autocomplete="off">
+                  </div>
+                  <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 0.5rem;">
+                    <span class="material-icons-round">save</span> 儲存自訂詞彙
+                  </button>
+                </form>
+              </div>
+            </div>
+
+            <!-- 自訂詞彙清單 -->
+            <div class="content-panel">
+              <div class="panel-header">
+                <span class="material-icons-round" style="color: var(--color-success);">list</span>
+                <h3>我的詞彙列表 (<span id="custom-total-count">0</span>)</h3>
+              </div>
+              <div class="vocab-table-wrapper" style="height: 420px; overflow-y: auto;">
+                <table class="vocab-list-table">
+                  <thead>
+                    <tr>
+                      <th>詞彙 / 英文翻譯</th>
+                      <th>例句對譯</th>
+                      <th>同步狀態</th>
+                      <th>操作</th>
+                    </tr>
+                  </thead>
+                  <tbody id="custom-vocab-rows">
+                    <tr><td colspan="4" class="text-center">載入自訂詞彙中...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
         <!-- 6. 系統設定頁面 -->
         <section id="view-settings" class="app-view hidden">
           <div class="view-header">
@@ -497,7 +607,7 @@
 
           <div class="settings-container">
             <!-- Firebase 設定面板 -->
-            <div class="content-panel">
+            <div id="firebase-config-panel" class="content-panel">
               <div class="panel-header">
                 <span class="material-icons-round">cloud_sync</span>
                 <h3>Firebase 連線設定 (儲存於本機瀏覽器)</h3>
@@ -575,6 +685,10 @@
       <a href="#/challenge" class="mobile-nav-item" data-view="challenge">
         <span class="material-icons-round">emoji_events</span>
         <span>挑戰</span>
+      </a>
+      <a href="#/custom-vocab" class="mobile-nav-item" data-view="custom-vocab">
+        <span class="material-icons-round">bookmarks</span>
+        <span>自訂詞</span>
       </a>
       <a href="#/leaderboard" class="mobile-nav-item" data-view="leaderboard">
         <span class="material-icons-round">leaderboard</span>

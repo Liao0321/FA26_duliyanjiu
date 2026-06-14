@@ -137,11 +137,14 @@ function renderCard(card, progress) {
   document.querySelector('.srs-status-box').style.display = 'flex';
   document.querySelector('.speed-control').style.display = 'flex';
 
+  const isCustom = card.isCustom;
+  const collocationLabel = isCustom ? '英文翻譯' : '搭配詞';
+
   // 1. 決定隨機題型 (0: 翻譯, 1: 填空, 2: 造句)
   const mode = Math.floor(Math.random() * 3);
   const modeBadge = document.getElementById('practice-mode-badge');
   const questionText = document.getElementById('practice-question');
-  
+
   if (mode === 0) {
     modeBadge.textContent = '【翻譯挑戰】';
     questionText.textContent = `請將以下的英文句子口頭翻譯為中文：\n\n${card.sentenceEN}`;
@@ -155,7 +158,7 @@ function renderCard(card, progress) {
     questionText.textContent = `請根據英文提示，口頭填入空格中的中文詞彙：\n\n${blank}\n\n英文提示：${card.sentenceEN}`;
   } else {
     modeBadge.textContent = '【造句挑戰】';
-    questionText.textContent = `請使用下方詞彙與搭配詞口頭完成造句：\n\n詞彙：「${card.word}」\n搭配詞：「${card.collocation || '無'}」\n\n英文提示：${card.sentenceEN}`;
+    questionText.textContent = `請使用下方詞彙與${collocationLabel}口頭完成造句：\n\n詞彙：「${card.word}」\n${collocationLabel}：「${card.collocation || '無'}」\n\n英文提示：${card.sentenceEN}`;
   }
 
   // 2. 處理提示圖片
@@ -194,7 +197,7 @@ function renderCard(card, progress) {
 
   // 4. 渲染卡片背面 (解答)
   document.getElementById('practice-word').textContent = card.word;
-  document.getElementById('practice-collocation').textContent = card.collocation ? `搭配詞：${card.collocation}` : '';
+  document.getElementById('practice-collocation').textContent = card.collocation ? `${collocationLabel}：${card.collocation}` : '';
   document.getElementById('practice-sentence').textContent = card.sentence;
   document.getElementById('practice-sentence-en').textContent = card.sentenceEN;
 

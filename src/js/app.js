@@ -4,7 +4,7 @@ import { renderDashboard } from './leaderboard.js'; // 儀表板繪製由 leader
 import { initPractice } from './practice.js';
 import { initChallenge } from './challenge.js';
 import { initLeaderboard } from './leaderboard.js';
-import { initTeacherConsole } from './vocab.js';
+import { initTeacherConsole, initCustomVocabView, getCustomVocab, syncCustomVocabToCloud } from './vocab.js';
 
 // 全域應用程式狀態
 export const AppState = {
@@ -91,6 +91,14 @@ export async function switchView(viewName) {
       switch (viewName) {
         case 'dashboard':
           await renderDashboard();
+          const countEl = document.getElementById('custom-vocab-count');
+          if (countEl) {
+            const list = await getCustomVocab();
+            countEl.textContent = list.length.toString();
+          }
+          break;
+        case 'custom-vocab':
+          await initCustomVocabView();
           break;
         case 'practice':
           initPractice();
@@ -149,6 +157,19 @@ export async function updateUserUI(user) {
       teacherBtn.classList.add('hidden');
     }
 
+    // 控制 Firebase 設定面板顯示與否
+    const firebaseConfigPanel = document.getElementById('firebase-config-panel');
+    if (firebaseConfigPanel) {
+      if (AppState.userRole === 'student') {
+        firebaseConfigPanel.classList.add('hidden');
+      } else {
+        firebaseConfigPanel.classList.remove('hidden');
+      }
+    }
+
+    // 立即觸發本機自訂詞彙同步至雲端
+    syncCustomVocabToCloud();
+
     // 切換頁面容器
     authPage.classList.add('hidden');
     appPage.classList.remove('hidden');
@@ -158,6 +179,12 @@ export async function updateUserUI(user) {
   } else {
     AppState.currentUser = null;
     AppState.userRole = 'student';
+    
+    // 訪客狀態：顯示 Firebase 設定面板
+    const firebaseConfigPanel = document.getElementById('firebase-config-panel');
+    if (firebaseConfigPanel) {
+      firebaseConfigPanel.classList.remove('hidden');
+    }
     
     authPage.classList.remove('hidden');
     appPage.classList.add('hidden');

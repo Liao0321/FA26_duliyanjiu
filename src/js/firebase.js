@@ -37,10 +37,6 @@ if (hasConfig && firebaseConfig && firebaseConfig.apiKey) {
     auth = firebase.auth();
     db = firebase.firestore();
     
-    // 啟用離線資料庫快取 (以確保離線時也能運作)
-    db.enablePersistence().catch(err => {
-      console.warn("離線快取無法啟動，這不影響正常運作:", err.code);
-    });
 
     provider = new firebase.auth.GoogleAuthProvider();
     // 強制每次登入都要求選擇 Google 帳號 (以便於更換學校帳號測試)
