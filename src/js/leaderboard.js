@@ -6,9 +6,14 @@ let leaderboardListener = null;
 /**
  * 初始化並監聽即時排行榜 (限制 10 筆)
  */
-export function initLeaderboard() {
+/**
+ * 載入指定模式的排行榜資料並即時監聽
+ * @param {'weekly' | 'endless'} mode 排行榜模式
+ */
+function loadLeaderboardData(mode) {
   const rowsContainer = document.getElementById('leaderboard-rows');
   const myRankCard = document.getElementById('my-ranking-card');
+  const headersRow = document.getElementById('leaderboard-headers');
 
   // 若有既有的監聽器，先卸載以防重複訂閱
   if (leaderboardListener) {
@@ -16,8 +21,35 @@ export function initLeaderboard() {
     leaderboardListener = null;
   }
 
+  // 動態更新表頭
+  if (headersRow) {
+    if (mode === 'weekly') {
+      headersRow.innerHTML = `
+        <th>排名</th>
+        <th>名字</th>
+        <th>挑戰分數</th>
+        <th>正確率</th>
+        <th>完成時間</th>
+        <th>更新時間</th>
+      `;
+    } else {
+      headersRow.innerHTML = `
+        <th>排名</th>
+        <th>名字</th>
+        <th>答對題數</th>
+        <th>平均時間</th>
+        <th>更新時間</th>
+      `;
+    }
+  }
+
+  // 顯示載入中
+  rowsContainer.innerHTML = '<tr><td colspan="6" class="text-center">載入排行榜數據中...</td></tr>';
+
+  const targetCollection = mode === 'weekly' ? 'leaderboard' : 'leaderboardEndless';
+
   // 實施即時監聽 Firestore
-  leaderboardListener = db.collection('leaderboard')
+  leaderboardListener = db.collection(targetCollection)
     .orderBy('score', 'desc')
     .onSnapshot(async (snapshot) => {
       rowsContainer.innerHTML = '';
@@ -27,8 +59,34 @@ export function initLeaderboard() {
         allRankings.push({ id: doc.id, ...doc.data() });
       });
 
+      // 記憶體複合排序，避免 Firestore 複合索引限制
+      if (mode === 'weekly') {
+        allRankings.sort((a, b) => {
+          const scoreA = a.score || 0;
+          const scoreB = b.score || 0;
+          if (scoreB !== scoreA) {
+            return scoreB - scoreA;
+          }
+          const timeA = a.timeSpent || 0;
+          const timeB = b.timeSpent || 0;
+          return timeA - timeB; // 耗時越短越靠前
+        });
+      } else {
+        allRankings.sort((a, b) => {
+          const scoreA = a.score || 0;
+          const scoreB = b.score || 0;
+          if (scoreB !== scoreA) {
+            return scoreB - scoreA;
+          }
+          const timeA = a.avgTime || 999.0;
+          const timeB = b.avgTime || 999.0;
+          return timeA - timeB; // 平均作答時間越短越靠前
+        });
+      }
+
       if (allRankings.length === 0) {
-        rowsContainer.innerHTML = '<tr><td colspan="6" class="text-center">目前尚無挑戰數據，快去當第一個吧！</td></tr>';
+        const colSpan = mode === 'weekly' ? 6 : 5;
+        rowsContainer.innerHTML = `<tr><td colspan="${colSpan}" class="text-center">目前尚無挑戰數據，快去當第一個吧！</td></tr>`;
         myRankCard.classList.add('hidden');
         return;
       }
@@ -49,14 +107,24 @@ export function initLeaderboard() {
         const updateDate = item.updatedAt ? new Date(item.updatedAt.seconds * 1000 || item.updatedAt) : new Date();
         const timeStr = `${(updateDate.getMonth()+1)}/${updateDate.getDate()} ${updateDate.getHours().toString().padStart(2,'0')}:${updateDate.getMinutes().toString().padStart(2,'0')}`;
 
-        tr.innerHTML = `
-          <td>${rankBadge}</td>
-          <td style="font-weight:600;">${item.username}</td>
-          <td style="color:var(--color-warning); font-weight:700;">${item.score} 分</td>
-          <td>${item.accuracy || 0}%</td>
-          <td>${item.timeSpent || 0}秒</td>
-          <td style="font-size:0.8rem; color:var(--text-muted);">${timeStr}</td>
-        `;
+        if (mode === 'weekly') {
+          tr.innerHTML = `
+            <td>${rankBadge}</td>
+            <td style="font-weight:600;">${item.username}</td>
+            <td style="color:var(--color-warning); font-weight:700;">${item.score} 分</td>
+            <td>${item.accuracy || 0}%</td>
+            <td>${item.timeSpent || 0}秒</td>
+            <td style="font-size:0.8rem; color:var(--text-muted);">${timeStr}</td>
+          `;
+        } else {
+          tr.innerHTML = `
+            <td>${rankBadge}</td>
+            <td style="font-weight:600;">${item.username}</td>
+            <td style="color:var(--color-warning); font-weight:700;">${item.score} 題</td>
+            <td>${item.avgTime || 0}秒</td>
+            <td style="font-size:0.8rem; color:var(--text-muted);">${timeStr}</td>
+          `;
+        }
 
         rowsContainer.appendChild(tr);
       });
@@ -65,6 +133,8 @@ export function initLeaderboard() {
       if (auth.currentUser) {
         const myUid = auth.currentUser.uid;
         const myIndex = allRankings.findIndex(item => item.uid === myUid);
+        const cheerEl = document.getElementById('my-rank-cheer');
+        const rankInfoPara = document.querySelector('#my-ranking-card .rank-info p');
 
         if (myIndex !== -1) {
           const myData = allRankings[myIndex];
@@ -72,38 +142,101 @@ export function initLeaderboard() {
           
           document.getElementById('my-rank-number').textContent = `#${myRank}`;
           document.getElementById('my-rank-name').textContent = myData.username;
-          document.getElementById('my-rank-score').textContent = `${myData.score} 分`;
-          document.getElementById('my-rank-accuracy').textContent = `${myData.accuracy}%`;
-          document.getElementById('my-rank-time').textContent = `${myData.timeSpent}秒`;
+          
+          if (mode === 'weekly') {
+            if (rankInfoPara) {
+              rankInfoPara.innerHTML = `最高分數：<strong id="my-rank-score">${myData.score} 分</strong> | 正確率：<span id="my-rank-accuracy">${myData.accuracy}%</span> | 耗時：<span id="my-rank-time">${myData.timeSpent}秒</span>`;
+            }
 
-          // 設定勉勵字樣與超越計算
-          const cheerEl = document.getElementById('my-rank-cheer');
-          if (myRank === 1) {
-            cheerEl.innerHTML = '👑 太強了！您目前是班級第一名！繼續保持！';
-          } else if (myRank <= 3) {
-            cheerEl.innerHTML = '✨ 棒極了！維持在前三名黃金殿堂中！';
+            // 設定每週挑戰勉勵字樣與超越計算
+            if (myRank === 1) {
+              cheerEl.innerHTML = '👑 太強了！您目前是班級第一名！繼續保持！';
+            } else if (myRank <= 3) {
+              cheerEl.innerHTML = '✨ 棒極了！維持在前三名黃金殿堂中！';
+            } else {
+              const aboveUser = allRankings[myIndex - 1];
+              const diffScore = aboveUser.score - myData.score;
+              cheerEl.innerHTML = `🔥 再獲得 <strong>${diffScore} 分</strong>，就能超越上一位同學（${aboveUser.username}）囉！`;
+            }
           } else {
-            const aboveUser = allRankings[myIndex - 1];
-            const diffScore = aboveUser.score - myData.score;
-            cheerEl.innerHTML = `🔥 再獲得 <strong>${diffScore} 分</strong>，就能超越上一位同學（${aboveUser.username}）囉！`;
+            if (rankInfoPara) {
+              rankInfoPara.innerHTML = `最高答對：<strong id="my-rank-score">${myData.score} 題</strong> | 平均時間：<span id="my-rank-time">${myData.avgTime}秒</span>`;
+            }
+
+            // 設定無盡挑戰勉勵字樣與超越計算
+            if (myRank === 1) {
+              cheerEl.innerHTML = '👑 太強了！您目前是無盡挑戰班級第一名！繼續保持！';
+            } else if (myRank <= 3) {
+              cheerEl.innerHTML = '✨ 棒極了！維持在無盡挑戰前三名中！';
+            } else {
+              const aboveUser = allRankings[myIndex - 1];
+              if (aboveUser.score > myData.score) {
+                const diffScore = aboveUser.score - myData.score;
+                cheerEl.innerHTML = `🔥 再多答對 <strong>${diffScore} 題</strong>，就能超越上一位同學（${aboveUser.username}）囉！`;
+              } else {
+                const diffTime = (myData.avgTime - aboveUser.avgTime).toFixed(2);
+                cheerEl.innerHTML = `🔥 平均作答時間再快 <strong>${diffTime} 秒</strong>，就能超越上一位同學（${aboveUser.username}）囉！`;
+              }
+            }
           }
 
           myRankCard.classList.remove('hidden');
         } else {
           // 學生尚未參與過挑戰
           document.getElementById('my-rank-number').textContent = '#--';
-          document.getElementById('my-rank-name').textContent = auth.currentUser.displayName;
-          document.getElementById('my-rank-score').textContent = '無紀錄';
-          document.getElementById('my-rank-accuracy').textContent = '0%';
-          document.getElementById('my-rank-time').textContent = '0s';
-          document.getElementById('my-rank-cheer').textContent = '您今天還沒有參與每日挑戰喔，快去挑戰上榜吧！';
+          document.getElementById('my-rank-name').textContent = auth.currentUser.displayName || '學生';
+          
+          if (mode === 'weekly') {
+            if (rankInfoPara) {
+              rankInfoPara.innerHTML = `最高分數：<strong id="my-rank-score">無紀錄</strong> | 正確率：<span id="my-rank-accuracy">0%</span> | 耗時：<span id="my-rank-time">0s</span>`;
+            }
+            cheerEl.innerHTML = '您這週還沒有參與每週挑戰喔，快去挑戰上榜吧！';
+          } else {
+            if (rankInfoPara) {
+              rankInfoPara.innerHTML = `最高答對：<strong id="my-rank-score">無紀錄</strong> | 平均時間：<span id="my-rank-time">0s</span>`;
+            }
+            cheerEl.innerHTML = '您還沒有參與無盡挑戰喔，快去挑戰你的極限吧！';
+          }
           myRankCard.classList.remove('hidden');
         }
       }
     }, (error) => {
       console.error("即時監聽排行榜出錯:", error);
-      rowsContainer.innerHTML = '<tr><td colspan="6" class="text-center" style="color:var(--color-danger)">載入排行榜失敗，請檢查權限</td></tr>';
+      const colSpan = mode === 'weekly' ? 6 : 5;
+      rowsContainer.innerHTML = `<tr><td colspan="${colSpan}" class="text-center" style="color:var(--color-danger)">載入排行榜失敗，請檢查權限</td></tr>`;
     });
+}
+
+/**
+ * 初始化並監聽即時排行榜 (限制 10 筆)
+ */
+export function initLeaderboard() {
+  const tabWeekly = document.getElementById('leaderboard-tab-weekly');
+  const tabEndless = document.getElementById('leaderboard-tab-endless');
+
+  // 綁定頁籤點擊事件
+  if (tabWeekly && tabEndless) {
+    tabWeekly.onclick = () => {
+      tabWeekly.classList.add('active');
+      tabEndless.classList.remove('active');
+      loadLeaderboardData('weekly');
+    };
+    tabEndless.onclick = () => {
+      tabEndless.classList.add('active');
+      tabWeekly.classList.remove('active');
+      loadLeaderboardData('endless');
+    };
+  }
+
+  // 根據當前頁籤的 active 狀態預設載入對應模式，若無 active 則預設為 weekly
+  if (tabWeekly && tabWeekly.classList.contains('active')) {
+    loadLeaderboardData('weekly');
+  } else if (tabEndless && tabEndless.classList.contains('active')) {
+    loadLeaderboardData('endless');
+  } else {
+    if (tabWeekly) tabWeekly.classList.add('active');
+    loadLeaderboardData('weekly');
+  }
 }
 
 /**

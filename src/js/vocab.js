@@ -526,6 +526,61 @@ export async function initTeacherConsole() {
     };
   }
 
+  // 3.5 每週挑戰設定初始化
+  const lessonSelect = document.getElementById('weekly-lesson-select');
+  const saveLessonBtn = document.getElementById('save-weekly-lesson-btn');
+  
+  if (lessonSelect && saveLessonBtn) {
+    try {
+      // 取得現有字庫
+      const allTextbookVocab = await getTextbookVocab(false);
+      
+      // 取得所有不重複的課別來源
+      const uniqueLessons = [...new Set(allTextbookVocab.map(item => item.source).filter(Boolean))];
+      uniqueLessons.sort();
+      
+      // 清空除預設 ALL 外的選項
+      lessonSelect.innerHTML = '<option value="ALL">全部課別 (ALL)</option>';
+      
+      uniqueLessons.forEach(lesson => {
+        const opt = document.createElement('option');
+        opt.value = lesson;
+        opt.textContent = lesson;
+        lessonSelect.appendChild(opt);
+      });
+      
+      // 讀取目前的雲端設定
+      const configDoc = await db.collection('systemConfig').doc('weeklyChallenge').get();
+      if (configDoc.exists) {
+        const currentLesson = configDoc.data().currentLesson || 'ALL';
+        lessonSelect.value = currentLesson;
+      }
+      
+      // 綁定儲存按鈕
+      saveLessonBtn.onclick = async () => {
+        saveLessonBtn.disabled = true;
+        saveLessonBtn.textContent = '正在儲存...';
+        
+        try {
+          const selectedLesson = lessonSelect.value;
+          await db.collection('systemConfig').doc('weeklyChallenge').set({
+            currentLesson: selectedLesson,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+          showToast(`每週挑戰指定課別已設為：${selectedLesson === 'ALL' ? '全部課別' : selectedLesson}`, 'success');
+        } catch (err) {
+          console.error("儲存每週挑戰設定失敗:", err);
+          showToast(`儲存失敗: ${err.message}`, 'error');
+        } finally {
+          saveLessonBtn.disabled = false;
+          saveLessonBtn.textContent = '儲存設定';
+        }
+      };
+    } catch (err) {
+      console.error("載入每週挑戰課別選項失敗:", err);
+    }
+  }
+
   // 4. 繪製現有詞彙表格
   await renderVocabListTable(false);
 }

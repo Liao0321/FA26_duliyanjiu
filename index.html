@@ -66,7 +66,7 @@
         </a>
         <a href="#/challenge" class="nav-item" data-view="challenge">
           <span class="material-icons-round">emoji_events</span>
-          <span>每日挑戰</span>
+          <span>每週挑戰</span>
         </a>
         <a href="#/leaderboard" class="nav-item" data-view="leaderboard">
           <span class="material-icons-round">leaderboard</span>
@@ -182,13 +182,15 @@
             <div class="content-panel info-panel">
               <div class="panel-header">
                 <span class="material-icons-round icon-blue">lightbulb</span>
-                <h3>💡 閃卡學習小撇步</h3>
+                <h3>💡 學習功能介紹 (Learning Guide)</h3>
               </div>
-              <div class="panel-body" style="font-size: 0.9rem; line-height: 1.6;">
-                <p style="margin-bottom: 0.75rem;"><strong>怎麼把單字記熟？</strong><br>
-                在「閃卡練習」中，如果對卡片有印象，請點選 <span style="color: var(--color-success); font-weight: 600;">記住了</span>，單字的熟練度就會升級。累積<strong>成功記住 7 次</strong>之後，該單字就會被歸類為「已熟記」，不會再重複出現在日常練習中囉！</p>
-                <p><strong>忘記了該怎麼辦？</strong><br>
-                別擔心！點選 <span style="color: var(--color-danger); font-weight: 600;">忘記了</span>，系統會特別幫你標記，並在之後的練習中更頻繁、優先地抽出來讓你複習，直到你完全記住為止！</p>
+              <div class="panel-body" style="font-size: 0.85rem; line-height: 1.6; padding: 1.25rem 1.5rem;">
+                <p style="margin-bottom: 0.75rem;"><strong>1. 閃卡練習 (Flashcard Practice)</strong>:<br>
+                Use flashcards to enhance your vocabulary proficiency. The system will track and record the words you know well and those that need more practice.</p>
+                <p style="margin-bottom: 0.75rem;"><strong>2. 每週挑戰 (Weekly Challenge)</strong>:<br>
+                Test your knowledge of the vocabulary for next week's "Domain Research in Chinese" class. Your score and rank will be displayed on the class leaderboard.</p>
+                <p><strong>3. 無盡模式 (Endless Mode)</strong>:<br>
+                A thrilling challenge with endless questions! This mode tests all vocabulary learned from the beginning of the semester to the present.</p>
               </div>
             </div>
           </div>
@@ -295,27 +297,52 @@
           </div>
         </section>
 
-        <!-- 3. 每日挑戰頁面 -->
+        <!-- 3. 每週挑戰頁面 -->
         <section id="view-challenge" class="app-view hidden">
           <div class="view-header">
-            <h2>每日詞彙挑戰 (10 題選擇題)</h2>
-            <p>限時競速，計分將自動更新至即時排行榜</p>
+            <h2>每週挑戰與無盡模式</h2>
+            <p>限時競速或限時驟死挑戰，挑戰自我並同步至即時排行榜</p>
           </div>
 
           <!-- 挑戰首頁/說明 -->
           <div id="challenge-start-screen" class="challenge-screen">
-            <div class="challenge-intro-card">
-              <span class="material-icons-round trophy-large">emoji_events</span>
-              <h3>今日挑戰規則</h3>
-              <ul>
-                <li>挑戰包含 <strong>10 題選擇題</strong>，均為四選一單選題。</li>
-                <li>題型隨機包括：中英翻譯、句子填空、聽音辨詞、聽句選詞。</li>
-                <li><strong>計分規則</strong>：每答對一題得 100 分，最後扣除總作答秒數。答對率高且答題快的人分數越高！</li>
-                <li>系統每天只會記錄您的<strong>最高分記錄</strong>在排行榜上。</li>
-              </ul>
-              <button id="start-challenge-btn" class="btn btn-primary btn-large btn-glow">
-                <span class="material-icons-round">play_arrow</span> 開始挑戰
-              </button>
+            <!-- 顯示本週範圍 -->
+            <div class="weekly-range-banner" style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: var(--radius-md); padding: 1rem; margin-bottom: 1.5rem; text-align: center; font-size: 1.05rem;">
+              📅 本週挑戰課別範圍：<strong id="weekly-challenge-lesson-label" style="color: var(--accent-primary);">讀取中...</strong>
+            </div>
+
+            <div class="challenge-modes-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem;">
+              <!-- 每週挑戰卡 -->
+              <div class="challenge-intro-card">
+                <span class="material-icons-round trophy-large">emoji_events</span>
+                <h3>每週精準挑戰</h3>
+                <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 1rem;">鎖定本週進度，挑戰你的精準度與反應力！</p>
+                <ul style="text-align: left; margin-bottom: 1.5rem; font-size: 0.85rem; line-height: 1.5;">
+                  <li>題目數量：共 <strong>10 題選擇題</strong>。</li>
+                  <li>題目範圍：僅限本週指定課別的單字。</li>
+                  <li><strong>計分方式</strong>：每題 100 分。若 10 題全對，可獲得限時 60 秒的<strong>速度加分 (剩餘秒數 * 10)</strong>！答錯任何一題則無法獲得速度加分。</li>
+                  <li>只記錄您的<strong>最高得分紀錄</strong>。</li>
+                </ul>
+                <button id="start-weekly-challenge-btn" class="btn btn-primary btn-large btn-glow" style="width: 100%;">
+                  <span class="material-icons-round">play_arrow</span> 開始每週挑戰
+                </button>
+              </div>
+
+              <!-- 無盡挑戰卡 -->
+              <div class="challenge-intro-card">
+                <span class="material-icons-round trophy-large" style="color: #a855f7; filter: drop-shadow(0 0 10px rgba(168,85,247,0.45))">all_inclusive</span>
+                <h3>極限無盡挑戰</h3>
+                <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 1rem;">單字量的終極試煉！你能堅持到第幾題？</p>
+                <ul style="text-align: left; margin-bottom: 1.5rem; font-size: 0.85rem; line-height: 1.5;">
+                  <li>題目數量：<strong>無限題數</strong>，題型隨機。</li>
+                  <li>作答限時：每題只有 <strong>10 秒作答時間</strong>。</li>
+                  <li><strong>淘汰規則</strong>：只要答錯任何一題，或時間到未作答，挑戰便立刻結束！</li>
+                  <li><strong>計分方式</strong>：成功答對的題數。同分時，平均作答時間越短的同學排名越高。</li>
+                </ul>
+                <button id="start-endless-challenge-btn" class="btn btn-secondary btn-large" style="width: 100%; border-color: rgba(168, 85, 247, 0.4); color: #c084fc;">
+                  <span class="material-icons-round">flash_on</span> 開始無盡挑戰
+                </button>
+              </div>
             </div>
           </div>
 
@@ -397,7 +424,13 @@
         <section id="view-leaderboard" class="app-view hidden">
           <div class="view-header">
             <h2>班級即時排行榜</h2>
-            <p>看看今天誰做得最好！即時同步雲端排行數據</p>
+            <p>即時同步雲端排行數據，展現你的單字實力！</p>
+          </div>
+
+          <!-- 排行榜切換 Tab -->
+          <div class="console-tabs" style="margin-bottom: 1.5rem;">
+            <button id="leaderboard-tab-weekly" class="console-tab active">每週挑戰排行</button>
+            <button id="leaderboard-tab-endless" class="console-tab">無盡挑戰排行</button>
           </div>
 
           <!-- 本日最高排行清單 -->
@@ -405,7 +438,7 @@
             <div class="leaderboard-table-wrapper">
               <table class="leaderboard-table">
                 <thead>
-                  <tr>
+                  <tr id="leaderboard-headers">
                     <th>排名</th>
                     <th>名字</th>
                     <th>挑戰分數</th>
@@ -505,6 +538,28 @@
               </div>
               <div id="import-preview-container" class="preview-container">
                 <div class="empty-state">請貼上內容並點選「解析貼上內容」</div>
+              </div>
+            </div>
+
+            <!-- 每週挑戰設定面板 -->
+            <div class="content-panel config-panel" style="grid-column: span 2; margin-top: 0.5rem; margin-bottom: 0.5rem;">
+              <div class="panel-header">
+                <span class="material-icons-round" style="color: var(--color-warning);">calendar_today</span>
+                <h3>每週挑戰範圍設定</h3>
+              </div>
+              <div class="panel-body" style="display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap; padding: 1.25rem 1.5rem;">
+                <p class="helper-text" style="flex-grow: 1; margin-bottom: 0; font-size: 0.85rem;">
+                  設定學生本週進行「每週挑戰」時的指定詞彙課別。系統將自動過濾該課別單字生成 10 題題目。
+                </p>
+                <div class="form-group row-layout" style="margin-bottom: 0; align-items: center; gap: 0.75rem;">
+                  <label for="weekly-lesson-select" style="white-space: nowrap; margin-bottom: 0; font-size: 0.9rem;">指定課別範圍：</label>
+                  <select id="weekly-lesson-select" style="background-color: rgba(0, 0, 0, 0.25); border: 1px solid var(--border-glass); border-radius: var(--radius-sm); padding: 0.6rem 1rem; color: var(--text-primary); outline: none; font-size: 0.9rem; cursor: pointer;">
+                    <option value="ALL">全部課別 (ALL)</option>
+                  </select>
+                  <button id="save-weekly-lesson-btn" class="btn btn-primary" style="padding: 0.6rem 1.25rem;">
+                    <span class="material-icons-round" style="font-size: 1.1rem;">save</span> 儲存設定
+                  </button>
+                </div>
               </div>
             </div>
 
