@@ -598,21 +598,27 @@ function parseGoogleSheetCsvData(csvText) {
   previewContainer.innerHTML = '';
 
   rows.forEach((cols, index) => {
-    if (cols.length === 0 || !cols[0].trim()) return;
+    if (cols.length === 0) return;
 
     // 剔除可能的欄位頭部 (標題列防呆)
-    if (index === 0 && (cols[0].includes('單字') || cols[0].includes('詞彙') || cols[0].includes('Word'))) {
+    if (index === 0 && (
+      cols[0].includes('標籤') || cols[0].includes('課程') || cols[0].includes('Tag') || cols[0].includes('Lesson') ||
+      (cols[1] && (cols[1].includes('單字') || cols[1].includes('詞彙') || cols[1].includes('Word')))
+    )) {
       return;
     }
 
-    const word = cols[0] ? cols[0].trim() : '';
-    const collocation = cols[1] ? cols[1].trim() : '';
-    const sentence = cols[2] ? cols[2].trim() : '';
-    const sentenceEN = cols[3] ? cols[3].trim() : '';
-    const source = cols[4] ? cols[4].trim() : '預設課別';
-    const image = cols[5] ? cols[5].trim() : '';
-    const audioWord = cols[6] ? cols[6].trim() : '';
-    const audioSentence = cols[7] ? cols[7].trim() : '';
+    const source = cols[0] ? cols[0].trim() : '預設課別';
+    const word = cols[1] ? cols[1].trim() : '';
+    const audioWord = cols[2] ? cols[2].trim() : '';
+    const collocation = cols[3] ? cols[3].trim() : '';
+    const audioCollocation = cols[4] ? cols[4].trim() : '';
+    const sentence = cols[5] ? cols[5].trim() : '';
+    const audioSentence = cols[6] ? cols[6].trim() : '';
+    const sentenceEN = cols[7] ? cols[7].trim() : '';
+    const image = cols[8] ? cols[8].trim() : '';
+
+    if (!word) return;
 
     const vocabItem = {
       word,
@@ -622,6 +628,7 @@ function parseGoogleSheetCsvData(csvText) {
       source,
       image,
       audioWord,
+      audioCollocation,
       audioSentence,
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     };
@@ -677,20 +684,24 @@ function parsePastedText(text) {
       cols = row.split(',');
     }
 
-    if (index === 0 && (cols[0].includes('單字') || cols[0].includes('詞彙') || cols[0].includes('Word'))) {
+    if (index === 0 && (
+      cols[0].includes('標籤') || cols[0].includes('課程') || cols[0].includes('Tag') || cols[0].includes('Lesson') ||
+      (cols[1] && (cols[1].includes('單字') || cols[1].includes('詞彙') || cols[1].includes('Word')))
+    )) {
       return;
     }
 
-    const word = cols[0] ? cols[0].trim() : '';
-    if (!word) return;
+    const source = cols[0] ? cols[0].trim() : '預設課別';
+    const word = cols[1] ? cols[1].trim() : '';
+    const audioWord = cols[2] ? cols[2].trim() : '';
+    const collocation = cols[3] ? cols[3].trim() : '';
+    const audioCollocation = cols[4] ? cols[4].trim() : '';
+    const sentence = cols[5] ? cols[5].trim() : '';
+    const audioSentence = cols[6] ? cols[6].trim() : '';
+    const sentenceEN = cols[7] ? cols[7].trim() : '';
+    const image = cols[8] ? cols[8].trim() : '';
 
-    const collocation = cols[1] ? cols[1].trim() : '';
-    const sentence = cols[2] ? cols[2].trim() : '';
-    const sentenceEN = cols[3] ? cols[3].trim() : '';
-    const source = cols[4] ? cols[4].trim() : '預設課別';
-    const image = cols[5] ? cols[5].trim() : '';
-    const audioWord = cols[6] ? cols[6].trim() : '';
-    const audioSentence = cols[7] ? cols[7].trim() : '';
+    if (!word) return;
 
     const vocabItem = {
       word,
@@ -700,6 +711,7 @@ function parsePastedText(text) {
       source,
       image,
       audioWord,
+      audioCollocation,
       audioSentence,
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     };
@@ -782,6 +794,7 @@ async function renderVocabListTable(forceRefresh = false) {
       const mediaHtml = [];
       if (item.image) mediaHtml.push(`<span class="media-tag"><span class="material-icons-round" style="font-size:0.95rem;">image</span> ${item.image}</span>`);
       if (item.audioWord) mediaHtml.push(`<span class="media-tag"><span class="material-icons-round" style="font-size:0.95rem;">volume_up</span> ${item.audioWord}</span>`);
+      if (item.audioCollocation) mediaHtml.push(`<span class="media-tag"><span class="material-icons-round" style="font-size:0.95rem;">volume_up</span> 搭配：${item.audioCollocation}</span>`);
       if (item.audioSentence) mediaHtml.push(`<span class="media-tag"><span class="material-icons-round" style="font-size:0.95rem;">play_circle</span> ${item.audioSentence}</span>`);
       
       if (mediaHtml.length === 0) {
